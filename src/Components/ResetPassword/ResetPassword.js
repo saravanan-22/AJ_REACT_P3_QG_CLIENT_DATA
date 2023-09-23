@@ -41,7 +41,7 @@ const ResetPassword = () => {
     if (userId && userPassword) {
       axios
         .patch(
-          `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/forgotPassword/${userId}`,
+          `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/forgotPassword/${userId}`,
           {
             password: userPassword,
           }

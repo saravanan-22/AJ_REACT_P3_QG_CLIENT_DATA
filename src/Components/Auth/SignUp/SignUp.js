@@ -43,7 +43,7 @@ const SignUp = () => {
     }
 
     axios
-      .post("https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/create", {
+      .post("https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/create", {
         profileImage: imageData,
         username: userName,
         email: email,

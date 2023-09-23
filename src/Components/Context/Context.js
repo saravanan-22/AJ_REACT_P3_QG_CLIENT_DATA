@@ -22,7 +22,7 @@ export const Context = ({ children }) => {
     // Fetch GK questions
     // Construct the API URL based on selectedCategory
     axios
-      .get(`https://muddy-bat-moccasins.cyclic.cloud/api/v1/questions/${selectedCategory}`)
+      .get(`https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/questions/${selectedCategory}`)
       .then((res) => {
         const fetchedQuestions = res.data.data;
         setGk(fetchedQuestions);
@@ -37,7 +37,7 @@ export const Context = ({ children }) => {
     // Fetch current points
     axios
       .get(
-        `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/getCurrentPoints/${userId}`
+        `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/getCurrentPoints/${userId}`
       )
       .then((res) => {
         const data = res.data.data;
@@ -50,7 +50,7 @@ export const Context = ({ children }) => {
     // Fetch previous points
     axios
       .get(
-        `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/getGkQuestions/previousPoints/${userId}`
+        `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/getGkQuestions/previousPoints/${userId}`
       )
       .then((res) => {
         const data = res.data.data;
@@ -63,7 +63,7 @@ export const Context = ({ children }) => {
     // Fetch total points and user details
     axios
       .get(
-        `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/getGkQuestions/totalPoints/${userId}`
+        `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/getGkQuestions/totalPoints/${userId}`
       )
       .then((res) => {
         const data = res.data.data;

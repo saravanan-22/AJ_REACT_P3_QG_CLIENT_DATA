@@ -30,7 +30,7 @@ const ProfilePage = () => {
 
   useEffect(() => {
     axios
-      .get("https://muddy-bat-moccasins.cyclic.cloud/api/v1/users")
+      .get("https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users")
       .then((res) => {
         const fetchedUsers = res.data.data;
         setUsersData(fetchedUsers);
@@ -81,7 +81,7 @@ const ProfilePage = () => {
     e.preventDefault();
     axios
       .put(
-        `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/editedUserData/singleUser/${userId}`,
+        `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/editedUserData/singleUser/${userId}`,
         {
           userImage: update,
           username: editedUsername,
@@ -105,7 +105,7 @@ const ProfilePage = () => {
     if (window.confirm("Are you sure you want to delete your account?")) {
       axios
         .delete(
-          `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/deleteAccount/${userId}`
+          `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/deleteAccount/${userId}`
         )
         .then((res) => {
           alert("account deleted successfully");

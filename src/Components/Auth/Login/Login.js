@@ -22,7 +22,7 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     axios
-      .get("https://muddy-bat-moccasins.cyclic.cloud/api/v1/users")
+      .get("https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users")
       .then((res) => {
         const fetchedUsers = res.data;
         const { data } = fetchedUsers;

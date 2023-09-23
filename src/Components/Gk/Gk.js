@@ -49,7 +49,7 @@ const initialState = {
   questions: [],
   selectedAnswer: [],
   currentQuestionIndex: 0,
-  timeRemaining: 30,
+  timeRemaining: 60,
   points: 0,
   pointsArray: [0],
   answeredCorrectly: [],
@@ -116,7 +116,7 @@ const Gk = () => {
            // update previous value in db-------------------
         axios
         .put(
-          `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/updateGkQuestions/previousPoints/${userId}`,
+          `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateGkQuestions/previousPoints/${userId}`,
           {
             prevPoint: preValues,
           }
@@ -136,7 +136,7 @@ const Gk = () => {
           // Update total points in your API or wherever it's needed
           axios
             .put(
-              `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/updateGKQuestions/totalPoints/${userId}`,
+              `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateGKQuestions/totalPoints/${userId}`,
               {
                 gkTotalPoints: totalValue,
               }
@@ -192,7 +192,7 @@ const Gk = () => {
 
           axios
             .put(
-              `https://muddy-bat-moccasins.cyclic.cloud/api/v1/users/updateCurrentPoints/${userId}`,
+              `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateCurrentPoints/${userId}`,
               {
                 currentPoints: updatedPoints,
               }
