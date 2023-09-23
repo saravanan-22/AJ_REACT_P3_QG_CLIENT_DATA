@@ -74,15 +74,15 @@ const Gk = () => {
   const [correctAnswerIndex, setCorrectAnswerIndex] = useState(0);
   const [answeredQuestionIndices, setAnsweredQuestionIndices] = useState([]);
 
-
-  const isQuestionAnswered = (questionIndex) => {
-    return answeredQuestionIndices.includes(questionIndex);
-  };
+  const [numQuestions, setNumQuestions] = useState(15); // Default to 15 questions
 
   // Shuffle the questions when Gk is updated
   useEffect(() => {
-    dispatch({ type: "SET_QUESTIONS", payload: shuffleArray(Gk) });
-  }, [Gk]);
+    dispatch({
+      type: "SET_QUESTIONS",
+      payload: shuffleArray(Gk).slice(0, numQuestions),
+    });
+  }, [Gk, numQuestions]);
 
   useEffect(() => {
     let timer;
@@ -99,7 +99,6 @@ const Gk = () => {
           window.location.reload();
         }, 4000);
 
-
         if (state.points > 0) {
           // Update current points array and save it to local storage
           const updatedCurrPointsArray = [...currPointsArray];
@@ -109,23 +108,20 @@ const Gk = () => {
             JSON.stringify(updatedCurrPointsArray)
           );
           const totalLength = currPointsArray.length;
-          // console.log(totalLength);
-          const exactLength = totalLength > 2 ? `${totalLength - Number(1)}` : 0;
+          const exactLength =
+            totalLength > 2 ? `${totalLength - Number(1)}` : 0;
           const preValues = currPointsArray[exactLength];
 
-           // update previous value in db-------------------
-        axios
-        .put(
-          `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateGkQuestions/previousPoints/${userId}`,
-          {
-            prevPoint: preValues,
-          }
-        )
-        .then((res) => console.log("previous point updated successfully"))
-        .catch((err) => console.log(err));
-          
+          axios
+            .put(
+              `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateGkQuestions/previousPoints/${userId}`,
+              {
+                prevPoint: preValues,
+              }
+            )
+            .then((res) => console.log("previous point updated successfully"))
+            .catch((err) => console.log(err));
 
-          // Calculate total points from the current points array
           const totalValue = updatedCurrPointsArray.reduce(
             (accumulator, currentValue) => {
               return accumulator + currentValue;
@@ -133,7 +129,6 @@ const Gk = () => {
             0
           );
 
-          // Update total points in your API or wherever it's needed
           axios
             .put(
               `https://ill-cyan-gosling-toga.cyclic.cloud/api/v1/users/updateGKQuestions/totalPoints/${userId}`,
@@ -154,7 +149,6 @@ const Gk = () => {
     };
   }, [state.timeRemaining, state.points]);
 
-
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const remainingSeconds = seconds % 60;
@@ -167,7 +161,6 @@ const Gk = () => {
     const currentQuestion = state.questions[state.currentQuestionIndex];
 
     if (currentQuestion) {
-      // Check if the question has already been answered
       if (!answeredQuestionIndices.includes(state.currentQuestionIndex)) {
         if (answer === currentQuestion.correct_answer) {
           const updatedPoints = state.points + 1;
@@ -205,7 +198,6 @@ const Gk = () => {
             });
         }
 
-        // Update the list of answered question indices
         setAnsweredQuestionIndices((prevIndices) => [
           ...prevIndices,
           state.currentQuestionIndex,
@@ -257,210 +249,219 @@ const Gk = () => {
     }
   };
 
+
   const handlePreviousQuestion = () => {
     if (state.currentQuestionIndex > 0) {
       const previousQuestionIndex = state.currentQuestionIndex - 1;
-  
-      // Check if the previous question has been answered
-      if (!isQuestionAnswered(previousQuestionIndex)) {
-        // If the previous question has not been answered, allow navigation
-        dispatch({
-          type: "SET_CURRENT_QUESTION_INDEX",
-          payload: previousQuestionIndex,
-        });
-        dispatch({ type: "SET_IS_OPTION_SELECTED", payload: false });
-        
-      }
-      
+      dispatch({
+        type: "SET_CURRENT_QUESTION_INDEX",
+        payload: previousQuestionIndex,
+      });
+      dispatch({ type: "SET_IS_OPTION_SELECTED", payload: false });
     }
   };
+
   
+
   return (
     <div
-    style={{
-      backgroundImage: `url(${image})`,
-      backgroundSize: "cover",
-      backgroundRepeat: "no-repeat",
-      backgroundPosition: "center",
-      height: "100vh",
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-    }}
-  >
-    <section style={{ marginTop: "6em" }}>
-      <h5
-        style={{
-          textAlign: "end",
-          margin: "0",
-          marginRight: "52px",
-          color: "red",
-        }}
-      >
-        Timer: {formatTime(state.timeRemaining)}
-      </h5>
-      {state.questions.map((gkQuestion, index) => (
-        <div
-          key={index}
+      style={{
+        backgroundImage: `url(${image})`,
+        backgroundSize: "cover",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+      }}
+    >
+      <section style={{ marginTop: "6em" }}>
+        <h5
           style={{
-            display: index === state.currentQuestionIndex ? "block" : "none",
+            textAlign: "end",
+            margin: "0",
+            marginRight: "52px",
+            color: "red",
           }}
         >
-          <Card
-            className="text-center mx-5 mb-2 transparent-card"
-            style={{ backgroundColor: "white" }}
+          Timer: {formatTime(state.timeRemaining)}
+        </h5>
+        <label
+          style={{
+            backgroundColor: "white",
+            padding: "1.5px",
+            borderRadius: "5px",
+          }}
+          htmlFor="numQuestions"
+        >
+          Number of Questions
+        </label>
+        <input
+          type="number"
+          id="numQuestions"
+          value={numQuestions}
+          onChange={(e) => setNumQuestions(e.target.value)}
+          min={1}
+          max={Gk.length}
+        />
+        {state.questions.map((gkQuestion, index) => (
+          <div
+            key={index}
+            style={{
+              display: index === state.currentQuestionIndex ? "block" : "none",
+            }}
           >
-            <Card.Header style={{ backgroundColor: "rgb(55, 134, 158)" }}>
-              {gkQuestion.category}
-            </Card.Header>
-            <Card.Body>
-              <Card.Title className="mb-3">
-                QUESTION : {gkQuestion.question}
-              </Card.Title>
-              <Row className="mb-2">
-                <Col md={6}>
-                  <Button
-                    onClick={() =>
-                      handleSelectAnswer(gkQuestion.incorrect_answers[0])
-                    }
-                    variant={
-                      state.selectedAnswer[state.currentQuestionIndex] ===
-                        gkQuestion.incorrect_answers[0] &&
-                      gkQuestion.incorrect_answers[0] ===
-                        gkQuestion.correct_answer
-                        ? "success"
-                        : state.selectedAnswer[state.currentQuestionIndex] ===
-                          gkQuestion.incorrect_answers[0]
-                        ? "danger"
-                        : "dark"
-                    }
-                    disabled={
-                      state.selectedAnswer[state.currentQuestionIndex] !==
-                        undefined ||
-                      state.isOptionSelected
-                    }
-                  >
-                    A . {gkQuestion.incorrect_answers[0]}
-                  </Button>
-                </Col>
-                <Col md={6}>
-                  <Button
-                    onClick={() =>
-                      handleSelectAnswer(gkQuestion.incorrect_answers[1])
-                    }
-                    variant={
-                      state.selectedAnswer[state.currentQuestionIndex] ===
-                        gkQuestion.incorrect_answers[1] &&
-                      gkQuestion.incorrect_answers[1] ===
-                        gkQuestion.correct_answer
-                        ? "success"
-                        : state.selectedAnswer[state.currentQuestionIndex] ===
-                          gkQuestion.incorrect_answers[1]
-                        ? "danger"
-                        : "dark"
-                    }
-                    disabled={
-                      state.selectedAnswer[state.currentQuestionIndex] !==
-                        undefined ||
-                      state.isOptionSelected
-                    }
-                  >
-                    B . {gkQuestion.incorrect_answers[1]}
-                  </Button>
-                </Col>
-              </Row>
-              <Row>
-                <Col md={6}>
-                  <Button
-                    onClick={() =>
-                      handleSelectAnswer(gkQuestion.incorrect_answers[2])
-                    }
-                    variant={
-                      state.selectedAnswer[state.currentQuestionIndex] ===
-                        gkQuestion.incorrect_answers[2] &&
-                      gkQuestion.incorrect_answers[2] ===
-                        gkQuestion.correct_answer
-                        ? "success"
-                        : state.selectedAnswer[state.currentQuestionIndex] ===
-                          gkQuestion.incorrect_answers[2]
-                        ? "danger"
-                        : "dark"
-                    }
-                    disabled={
-                      state.selectedAnswer[state.currentQuestionIndex] !==
-                        undefined ||
-                      state.isOptionSelected
-                    }
-                  >
-                    C . {gkQuestion.incorrect_answers[2]}
-                  </Button>
-                </Col>
-                <Col md={6}>
-                  <Button
-                    onClick={() =>
-                      handleSelectAnswer(gkQuestion.incorrect_answers[3])
-                    }
-                    variant={
-                      state.selectedAnswer[state.currentQuestionIndex] ===
-                        gkQuestion.incorrect_answers[3] &&
-                      gkQuestion.incorrect_answers[3] ===
-                        gkQuestion.correct_answer
-                        ? "success"
-                        : state.selectedAnswer[state.currentQuestionIndex] ===
-                          gkQuestion.incorrect_answers[3]
-                        ? "danger"
-                        : "dark"
-                    }
-                    disabled={
-                      state.selectedAnswer[state.currentQuestionIndex] !==
-                        undefined ||
-                      state.isOptionSelected
-                    }
-                  >
-                    D . {gkQuestion.incorrect_answers[3]}
-                  </Button>
-                </Col>
-              </Row>
-            </Card.Body>
-            <Card.Footer
-              className="text-muted"
-              style={{ backgroundColor: "rgb(55, 134, 158)" }}
+            <Card
+              className="text-center mx-5 mb-2 transparent-card"
+              style={{ backgroundColor: "white" }}
             >
-              {gkQuestion.questionType}
-            </Card.Footer>
-          </Card>
+              <Card.Header style={{ backgroundColor: "rgb(55, 134, 158)" }}>
+                {gkQuestion.category}
+              </Card.Header>
+              <Card.Body>
+                <Card.Title className="mb-3">
+                  QUESTION : {gkQuestion.question}
+                </Card.Title>
+                <Row className="mb-2">
+                  <Col md={6}>
+                    <Button
+                      onClick={() =>
+                        handleSelectAnswer(gkQuestion.incorrect_answers[0])
+                      }
+                      variant={
+                        state.selectedAnswer[state.currentQuestionIndex] ===
+                          gkQuestion.incorrect_answers[0] &&
+                        gkQuestion.incorrect_answers[0] ===
+                          gkQuestion.correct_answer
+                          ? "success"
+                          : state.selectedAnswer[state.currentQuestionIndex] ===
+                            gkQuestion.incorrect_answers[0]
+                          ? "danger"
+                          : "dark"
+                      }
+                     disabled={
+                      state.selectedAnswer[state.currentQuestionIndex] !==
+                        undefined || answeredQuestionIndices.includes(index)
+                    }
+                    >
+                      A . {gkQuestion.incorrect_answers[0]}
+                    </Button>
+                  </Col>
+                  <Col md={6}>
+                    <Button
+                      onClick={() =>
+                        handleSelectAnswer(gkQuestion.incorrect_answers[1])
+                      }
+                      variant={
+                        state.selectedAnswer[state.currentQuestionIndex] ===
+                          gkQuestion.incorrect_answers[1] &&
+                        gkQuestion.incorrect_answers[1] ===
+                          gkQuestion.correct_answer
+                          ? "success"
+                          : state.selectedAnswer[state.currentQuestionIndex] ===
+                            gkQuestion.incorrect_answers[1]
+                          ? "danger"
+                          : "dark"
+                      }
+                      disabled={
+                        state.selectedAnswer[state.currentQuestionIndex] !==
+                          undefined || answeredQuestionIndices.includes(index)
+                      }
+                    >
+                      B . {gkQuestion.incorrect_answers[1]}
+                    </Button>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col md={6}>
+                    <Button
+                      onClick={() =>
+                        handleSelectAnswer(gkQuestion.incorrect_answers[2])
+                      }
+                      variant={
+                        state.selectedAnswer[state.currentQuestionIndex] ===
+                          gkQuestion.incorrect_answers[2] &&
+                        gkQuestion.incorrect_answers[2] ===
+                          gkQuestion.correct_answer
+                          ? "success"
+                          : state.selectedAnswer[state.currentQuestionIndex] ===
+                            gkQuestion.incorrect_answers[2]
+                          ? "danger"
+                          : "dark"
+                      }
+                      disabled={
+                        state.selectedAnswer[state.currentQuestionIndex] !==
+                          undefined || answeredQuestionIndices.includes(index)
+                      }
+                    >
+                      C . {gkQuestion.incorrect_answers[2]}
+                    </Button>
+                  </Col>
+                  <Col md={6}>
+                    <Button
+                      onClick={() =>
+                        handleSelectAnswer(gkQuestion.incorrect_answers[3])
+                      }
+                      variant={
+                        state.selectedAnswer[state.currentQuestionIndex] ===
+                          gkQuestion.incorrect_answers[3] &&
+                        gkQuestion.incorrect_answers[3] ===
+                          gkQuestion.correct_answer
+                          ? "success"
+                          : state.selectedAnswer[state.currentQuestionIndex] ===
+                            gkQuestion.incorrect_answers[3]
+                          ? "danger"
+                          : "dark"
+                      }
+                      disabled={
+                        state.selectedAnswer[state.currentQuestionIndex] !==
+                          undefined || answeredQuestionIndices.includes(index)
+                      }
+                    >
+                      D . {gkQuestion.incorrect_answers[3]}
+                    </Button>
+                  </Col>
+                </Row>
+              </Card.Body>
+              <Card.Footer
+                className="text-muted"
+                style={{ backgroundColor: "rgb(55, 134, 158)" }}
+              >
+                {gkQuestion.questionType}
+              </Card.Footer>
+            </Card>
+          </div>
+        ))}
+        <div className="text-center">
+          {state.currentQuestionIndex > 0 && (
+            <Button
+              onClick={handlePreviousQuestion}
+              variant="primary"
+              className="me-2"
+            >
+              Previous Question
+            </Button>
+          )}
+          {state.currentQuestionIndex < state.questions.length - 1 && (
+            <Button onClick={handleNextQuestion} variant="success">
+              Next Question
+            </Button>
+          )}
         </div>
-      ))}
-      <div className="text-center">
-        {state.currentQuestionIndex > 0 && (
-          <Button
-            onClick={handlePreviousQuestion}
-            variant="primary"
-            className="me-2"
-          >
-            Previous Question
-          </Button>
-        )}
-        {state.currentQuestionIndex < state.questions.length - 1 && (
-          <Button onClick={handleNextQuestion} variant="success">
-            Next Question
-          </Button>
-        )}
-      </div>
-      <h6 className="text-start ms-5" style={{ color: "rgb(246, 222, 100)" }}>
-        POINTS: {state.points}
-      </h6>
-      <h6 className="text-start ms-5" style={{ color: "rgb(55, 134, 158)" }}>
-        Selected Answer:{" "}
-        {state.selectedAnswer[state.currentQuestionIndex] || "Not Selected"}
-      </h6>
-      <h6 className="text-start ms-5" style={{ color: "rgb(246, 222, 100)" }}>
-        Questions No: {state.currentQuestionIndex}
-      </h6>
-    </section>
-  </div>
-);
+        <h6 className="text-start ms-5" style={{ color: "rgb(246, 222, 100)" }}>
+          POINTS: {state.points}
+        </h6>
+        <h6 className="text-start ms-5" style={{ color: "rgb(55, 134, 158)" }}>
+          Selected Answer:{" "}
+          {state.selectedAnswer[state.currentQuestionIndex] || "Not Selected"}
+        </h6>
+        <h6 className="text-start ms-5" style={{ color: "rgb(246, 222, 100)" }}>
+          Questions No: {state.currentQuestionIndex}
+        </h6>
+      </section>
+    </div>
+  );
 };
-
 
 export default Gk;
