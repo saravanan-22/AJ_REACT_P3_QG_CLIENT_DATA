@@ -1,0 +1,23 @@
+.points-table {
+    border-collapse: collapse;
+    width: 80%;
+    margin: auto;
+    margin-top: 2em;
+    border-radius: 5px;
+  }
+  
+  .points-table th, .points-table td {
+    border: 1px solid #3700ff;
+    padding: 5px;
+    text-align: center;
+    
+
+  }
+  
+  .points-table th {
+    background-color:rgba(128, 126, 126, 0.6);
+
+
+ 
+  }
+  
